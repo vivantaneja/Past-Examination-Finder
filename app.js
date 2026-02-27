@@ -172,7 +172,7 @@
     var course = document.getElementById('course').value;
     var select = document.getElementById('subject');
     var currentSubject = select.value;
-    select.innerHTML = '<option value="">Select subject</option>';
+    select.innerHTML = '<option value="" disabled>Select subject</option>';
     select.disabled = !course;
     if (!course) {
       select.value = '';
@@ -195,7 +195,7 @@
     var subjectName = document.getElementById('subject').value;
     var select = document.getElementById('year');
     var currentYear = select.value;
-    select.innerHTML = '<option value="">Select year</option>';
+    select.innerHTML = '<option value="" disabled>Select year</option>';
     select.disabled = !course || !subjectName;
     if (!course || !subjectName) {
       select.value = '';
@@ -219,7 +219,7 @@
     var year = document.getElementById('year').value;
     var select = document.getElementById('level');
     var currentLevel = select.value;
-    select.innerHTML = '<option value="">Select level</option>';
+    select.innerHTML = '<option value="" disabled>Select level</option>';
     select.disabled = !course || !subjectName || !year;
     if (!course || !subjectName || !year) {
       select.value = '';
@@ -245,7 +245,7 @@
     var level = document.getElementById('level').value;
     var select = document.getElementById('language');
     var currentLang = select.value;
-    select.innerHTML = '<option value="">Select language</option>';
+    select.innerHTML = '<option value="" disabled>Select language</option>';
     select.disabled = !course || !subjectName || !year || !level;
     if (!course || !subjectName || !year || !level) {
       select.value = '';
@@ -280,7 +280,7 @@
     var select = document.getElementById('materialType');
     var currentType = select.value;
 
-    select.innerHTML = '<option value="">Select material type</option>';
+    select.innerHTML = '<option value="" disabled>Select material type</option>';
     select.disabled = !course || !subjectName || !year || !level || !langCode;
 
     if (!course || !subjectName || !year || !level || !langCode) {
