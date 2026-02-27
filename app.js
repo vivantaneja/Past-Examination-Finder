@@ -314,7 +314,16 @@
       var el = document.getElementById(id);
       if (el) {
         el.addEventListener('change', function () {
-          if (id === 'course') populateSubjects();
+          if (id === 'course') {
+            // Once an examination has been chosen, prevent going back to the placeholder
+            if (el.value !== '') {
+              var placeholder = el.querySelector('option[value=\"\"]');
+              if (placeholder) {
+                placeholder.disabled = true;
+              }
+            }
+            populateSubjects();
+          }
           else if (id === 'subject') populateYears();
           else if (id === 'year') populateLevels();
           else if (id === 'level') populateLanguages();
