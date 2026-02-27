@@ -171,10 +171,11 @@
   function populateSubjects() {
     var course = document.getElementById('course').value;
     var select = document.getElementById('subject');
-    select.innerHTML = '<option value="">— Select subject —</option>';
-    select.value = '';
+    var currentSubject = select.value;
+    select.innerHTML = '<option value="">Select subject</option>';
     select.disabled = !course;
     if (!course) {
+      select.value = '';
       populateYears();
       return;
     }
@@ -185,6 +186,7 @@
       opt.textContent = id;
       select.appendChild(opt);
     });
+    select.value = subjects.indexOf(currentSubject) !== -1 ? currentSubject : '';
     populateYears();
   }
 
@@ -192,10 +194,11 @@
     var course = document.getElementById('course').value;
     var subjectName = document.getElementById('subject').value;
     var select = document.getElementById('year');
-    select.innerHTML = '<option value="">— Select year —</option>';
-    select.value = '';
+    var currentYear = select.value;
+    select.innerHTML = '<option value="">Select year</option>';
     select.disabled = !course || !subjectName;
     if (!course || !subjectName) {
+      select.value = '';
       populateLevels();
       return;
     }
@@ -206,6 +209,7 @@
       opt.textContent = y;
       select.appendChild(opt);
     });
+    select.value = years.indexOf(currentYear) !== -1 ? currentYear : '';
     populateLevels();
   }
 
@@ -214,10 +218,11 @@
     var subjectName = document.getElementById('subject').value;
     var year = document.getElementById('year').value;
     var select = document.getElementById('level');
-    select.innerHTML = '<option value="">— Select level —</option>';
-    select.value = '';
+    var currentLevel = select.value;
+    select.innerHTML = '<option value="">Select level</option>';
     select.disabled = !course || !subjectName || !year;
     if (!course || !subjectName || !year) {
+      select.value = '';
       populateLanguages();
       return;
     }
@@ -229,6 +234,7 @@
       opt.textContent = l;
       select.appendChild(opt);
     });
+    select.value = levels.indexOf(currentLevel) !== -1 ? currentLevel : '';
     populateLanguages();
   }
 
@@ -238,10 +244,17 @@
     var year = document.getElementById('year').value;
     var level = document.getElementById('level').value;
     var select = document.getElementById('language');
-    select.innerHTML = '<option value="">— Select language —</option>';
-    select.value = '';
+    var currentLang = select.value;
+    select.innerHTML = '<option value="">Select language</option>';
     select.disabled = !course || !subjectName || !year || !level;
     if (!course || !subjectName || !year || !level) {
+      select.value = '';
+      populateMaterialTypes();
+      return;
+    }
+    /* If level was cleared (invalid for new course/subject/year), clear language and below */
+    if (!level) {
+      select.value = '';
       populateMaterialTypes();
       return;
     }
@@ -254,6 +267,7 @@
       opt.textContent = LANGUAGES[code] || code;
       select.appendChild(opt);
     });
+    select.value = codes.indexOf(currentLang) !== -1 ? currentLang : '';
     populateMaterialTypes();
   }
 
@@ -264,12 +278,13 @@
     var level = document.getElementById('level').value;
     var langCode = document.getElementById('language').value;
     var select = document.getElementById('materialType');
+    var currentType = select.value;
 
-    select.innerHTML = '<option value="">— Select material type —</option>';
-    select.value = '';
+    select.innerHTML = '<option value="">Select material type</option>';
     select.disabled = !course || !subjectName || !year || !level || !langCode;
 
     if (!course || !subjectName || !year || !level || !langCode) {
+      select.value = '';
       updateResults();
       return;
     }
@@ -290,6 +305,7 @@
       }
     });
 
+    select.value = types.has(currentType) ? currentType : '';
     updateResults();
   }
 
