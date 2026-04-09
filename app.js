@@ -1,7 +1,8 @@
 (function () {
   'use strict';
 
-  const BASE_URL = 'https://www.examinations.ie/archive/exampapers';
+  const EXAM_PAPERS_BASE_URL = 'https://www.examinations.ie/archive/exampapers';
+  const MARKING_SCHEMES_BASE_URL = 'https://www.examinations.ie/archive/markingschemes';
   const COURSES = {
     jc: 'Junior Certificate',
     lc: 'Leaving Certificate',
@@ -108,8 +109,12 @@
     return entries;
   }
 
-  function buildPaperUrl(year, url) {
-    return BASE_URL + '/' + encodeURIComponent(year) + '/' + encodeURIComponent(url);
+  function buildPaperUrl(year, entry) {
+    var materialType = classifyMaterialType(entry);
+    var baseUrl = materialType === 'Marking Scheme' || materialType === 'Deferred Marking Scheme'
+      ? MARKING_SCHEMES_BASE_URL
+      : EXAM_PAPERS_BASE_URL;
+    return baseUrl + '/' + encodeURIComponent(year) + '/' + encodeURIComponent(entry.url);
   }
 
   function showLoading(show) {
@@ -134,7 +139,7 @@
     papers.forEach(function (p) {
       var li = document.createElement('li');
       var a = document.createElement('a');
-      a.href = buildPaperUrl(year, p.url);
+      a.href = buildPaperUrl(year, p);
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
       a.textContent = p.details || p.url;

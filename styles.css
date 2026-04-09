@@ -46,7 +46,7 @@ body > .site-header {
 body > main {
   flex: 1;
   width: 100%;
-  max-width: 52rem;
+  max-width: 72rem;
   margin: 0 auto;
   padding: var(--space-lg) var(--space-md);
 }
@@ -97,10 +97,9 @@ body > .footer {
   border: 1px solid var(--color-border);
   padding: var(--space-lg);
   margin-bottom: var(--space-xl);
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-md);
-  align-items: flex-end;
 }
 
 .filters label {
@@ -119,7 +118,8 @@ body > .footer {
 }
 
 .filters select {
-  min-width: 11rem;
+  min-width: 0;
+  width: 100%;
   padding: 0.625rem 2rem 0.625rem 0.75rem;
   font-family: var(--font-sans);
   font-size: 0.9375rem;
@@ -319,8 +319,7 @@ body > .footer {
   }
 
   .filters {
-    flex-direction: column;
-    align-items: stretch;
+    grid-template-columns: 1fr;
   }
 
   .filters label {
