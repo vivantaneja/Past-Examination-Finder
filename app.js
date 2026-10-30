@@ -1,22 +1,20 @@
 (function () {
   'use strict';
 
-  const EXAM_PAPERS_BASE_URL = 'https://www.examinations.ie/archive/exampapers';
-  const MARKING_SCHEMES_BASE_URL = 'https://www.examinations.ie/archive/markingschemes';
+  const catalogue = window.ExamCatalogue;
   const COURSES = {
-    jc: 'Junior Certificate',
+    jc: 'Junior Cycle / Junior Certificate',
     lc: 'Leaving Certificate',
     lb: 'Leaving Certificate Applied'
   };
-  const LEVELS_ORDER = ['Higher', 'Ordinary', 'Foundation', 'Common'];
-  const LANGUAGES = { EV: 'English', IV: 'Irish' };
-  const MATERIAL_TYPES_ORDER = [
-    'Exam Paper',
-    'Marking Scheme',
-    'Deferred Exam Paper',
-    'Deferred Marking Scheme',
-    'Audio'
-  ];
+  const LANGUAGES = catalogue.LANGUAGES;
+  const MATERIAL_TYPES_ORDER = catalogue.MATERIAL_TYPES_ORDER;
+  const getLevelsFromEntries = catalogue.getLevelsFromEntries;
+  const getLanguagesFromEntries = catalogue.getLanguagesFromEntries;
+  const filterEntriesByLevel = catalogue.filterEntriesByLevel;
+  const filterEntriesByLanguage = catalogue.filterEntriesByLanguage;
+  const classifyMaterialType = catalogue.classifyMaterialType;
+  const buildPaperUrl = catalogue.buildPaperUrl;
 
   let data = null;
 
@@ -47,56 +45,6 @@
     return data[course][subjectName][year] || [];
   }
 
-  function getLevelsFromEntries(entries) {
-    const levels = new Set();
-    LEVELS_ORDER.forEach(function (lvl) {
-      if (entries.some(function (e) { return e.details && e.details.indexOf(lvl) !== -1; })) {
-        levels.add(lvl);
-      }
-    });
-    return LEVELS_ORDER.filter(function (l) { return levels.has(l); });
-  }
-
-  function getLanguagesFromEntries(entries) {
-    const codes = new Set();
-    entries.forEach(function (e) {
-      const url = (e.url || '').toUpperCase();
-      if (url.endsWith('EV.PDF') || url.endsWith('EV.MP3')) codes.add('EV');
-      if (url.endsWith('IV.PDF') || url.endsWith('IV.MP3')) codes.add('IV');
-    });
-    return Object.keys(LANGUAGES).filter(function (code) { return codes.has(code); });
-  }
-
-  function filterEntriesByLevel(entries, level) {
-    return entries.filter(function (e) { return e.details && e.details.indexOf(level) !== -1; });
-  }
-
-  function filterEntriesByLanguage(entries, langCode) {
-    const upper = (langCode || '').toUpperCase();
-    return entries.filter(function (e) {
-      const url = (e.url || '').toUpperCase();
-      return url.endsWith(upper + '.PDF') || url.endsWith(upper + '.MP3');
-    });
-  }
-
-  function classifyMaterialType(entry) {
-    const t = (entry.type || '').trim();
-    const details = entry.details || '';
-    const url = entry.url || '';
-    const urlUpper = url.toUpperCase();
-    const detailsUpper = details.toUpperCase();
-
-    if (urlUpper.endsWith('.MP3') || detailsUpper.indexOf('SOUND FILE') !== -1) {
-      return 'Audio';
-    }
-    if (t === 'Exam Paper') return 'Exam Paper';
-    if (t === 'Marking Scheme') return 'Marking Scheme';
-    if (t === 'Deferred Exam Paper') return 'Deferred Exam Paper';
-    if (t === 'Deferred Marking Scheme') return 'Deferred Marking Scheme';
-
-    return '';
-  }
-
   function getEntries(course, subjectName, year, level, langCode, materialType) {
     let entries = getEntriesForYear(course, subjectName, year);
     entries = filterEntriesByLevel(entries, level);
@@ -107,14 +55,6 @@
       });
     }
     return entries;
-  }
-
-  function buildPaperUrl(year, entry) {
-    var materialType = classifyMaterialType(entry);
-    var baseUrl = materialType === 'Marking Scheme' || materialType === 'Deferred Marking Scheme'
-      ? MARKING_SCHEMES_BASE_URL
-      : EXAM_PAPERS_BASE_URL;
-    return baseUrl + '/' + encodeURIComponent(year) + '/' + encodeURIComponent(entry.url);
   }
 
   function showLoading(show) {
@@ -137,9 +77,11 @@
     if (!list) return;
     list.innerHTML = '';
     papers.forEach(function (p) {
+      var href = buildPaperUrl(year, p);
+      if (!href) return;
       var li = document.createElement('li');
       var a = document.createElement('a');
-      a.href = buildPaperUrl(year, p);
+      a.href = href;
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
       a.textContent = p.details || p.url;
@@ -341,8 +283,11 @@
 
   function init() {
     showLoading(true);
-    fetch('data.json')
-      .then(function (r) { return r.json(); })
+    fetch('data.json', { cache: 'no-cache' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('Could not load the exam catalogue (' + r.status + ').');
+        return r.json();
+      })
       .then(function (json) {
         data = json;
         showLoading(false);
